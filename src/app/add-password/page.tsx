@@ -20,14 +20,17 @@ const AddPasswordPage: React.FC = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/passwords", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Send the token with the request
-        },
-        body: JSON.stringify({ website, websiteName, username, password }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/passwords`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Send the token with the request
+          },
+          body: JSON.stringify({ website, websiteName, username, password }),
+        }
+      );
 
       if (response.ok) {
         // Redirect to the dashboard or another page after successful addition
