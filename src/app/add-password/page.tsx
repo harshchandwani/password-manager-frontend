@@ -46,51 +46,92 @@ const AddPasswordPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Add New Password</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
+    <div className="max-w-lg mx-auto mt-10 p-6 shadow-lg rounded-lg">
+      <h1 className="text-3xl font-bold text-center mb-6">New Password</h1>
+
+      {/* Error Message */}
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Website URL */}
         <div>
-          <label htmlFor="website">Website:</label>
+          <label
+            htmlFor="website"
+            className="block mb-2 text-sm font-medium text-gray-700"
+          >
+            Website URL:
+          </label>
           <input
             type="text"
             id="website"
             value={website}
             onChange={e => setWebsite(e.target.value)}
             required
+            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
           />
         </div>
+
+        {/* Website Name */}
         <div>
-          <label htmlFor="websiteName">Website Name:</label>
+          <label
+            htmlFor="websiteName"
+            className="block mb-2 text-sm font-medium text-gray-700"
+          >
+            Website Name:
+          </label>
           <input
             type="text"
             id="websiteName"
             value={websiteName}
             onChange={e => setWebsiteName(e.target.value)}
             required
+            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
           />
         </div>
+
+        {/* Username */}
         <div>
-          <label htmlFor="username">Username:</label>
+          <label
+            htmlFor="username"
+            className="block mb-2 text-sm font-medium text-gray-700"
+          >
+            Username:
+          </label>
           <input
             type="text"
             id="username"
             value={username}
             onChange={e => setUsername(e.target.value)}
             required
+            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
           />
         </div>
+
+        {/* Password */}
         <div>
-          <label htmlFor="password">Password:</label>
+          <label
+            htmlFor="password"
+            className="block mb-2 text-sm font-medium text-gray-700"
+          >
+            Password:
+          </label>
           <input
             type="password"
             id="password"
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
+            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
           />
         </div>
-        <button type="submit">Add Password</button>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className="w-full p-3 text-sm font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-opacity-50"
+        >
+          Add Password
+        </button>
       </form>
     </div>
   );

@@ -8,42 +8,41 @@ const DashboardPage: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchPasswords = async () => {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        router.push("/login"); // Redirect to login if not authenticated
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/passwords`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Send the token with the request
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          setPasswords(data); // Set the retrieved passwords
-        } else {
-          const errorData = await response.json();
-          setError(errorData.error || "Failed to load passwords.");
-        }
-      } catch (error) {
-        console.error("An error occurred:", error);
-        setError("Failed to load passwords due to an error.");
-      }
-    };
-
     fetchPasswords();
   }, [router]);
 
+  const fetchPasswords = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      router.push("/login"); // Redirect to login if not authenticated
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/passwords`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Send the token with the request
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setPasswords(data); // Set the retrieved passwords
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to load passwords.");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      setError("Failed to load passwords due to an error.");
+    }
+  };
   const handleLogout = () => {
     localStorage.removeItem("token"); // Remove the token from local storage
     router.push("/login"); // Redirect to login page
@@ -83,18 +82,95 @@ const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Your Passwords</h1>
+    <div className="container mx-auto p-6">
+      {/* Heading */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-4xl font-bold">Passwords</h1>
+        <div className="flex space-x-4">
+          {/* Add New Password Button */}
+          <button
+            onClick={() => router.push("/add-password")} // Redirect to add-password page
+            className="bg-orange-500 text-white px-4 py-2 rounded"
+          >
+            Add New Password
+          </button>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+
+      {/* Error Message */}
       {error && <p style={{ color: "red" }}>{error}</p>}
-      <button onClick={handleLogout}>Logout</button>
+
+      {/* Table Header */}
+      <div className="grid grid-cols-5 gap-4 items-center font-semibold mb-3">
+        <div className="text-left">Website Name</div>
+        <div className="text-left">Username</div>
+        <div className="text-left">Password</div>
+        <div className="text-center">Actions</div>
+      </div>
+
+      {/* Password Entries */}
       <ul>
         {passwords.map(passwordEntry => (
-          <li key={passwordEntry.id}>
-            <strong>{passwordEntry.websiteName}</strong>:{" "}
-            {passwordEntry.password}
-            <button onClick={() => deletePassword(passwordEntry.id)}>
-              Delete
-            </button>
+          <li
+            key={passwordEntry.id}
+            className="grid grid-cols-5 gap-4 items-center mb-3"
+          >
+            {/* Website Name */}
+            <div className="text-left">{passwordEntry.websiteName}</div>
+
+            {/* Username */}
+            <div className="flex items-center">
+              <span>{passwordEntry.username}</span>
+              <button
+                onClick={() =>
+                  navigator.clipboard.writeText(passwordEntry.username)
+                }
+                className="ml-3 bg-blue-500 text-white px-3 py-1 rounded"
+              >
+                Copy
+              </button>
+            </div>
+
+            {/* Password with Copy Button */}
+            <div className="flex items-center">
+              <span>{passwordEntry.password}</span>
+              <button
+                onClick={() =>
+                  navigator.clipboard.writeText(passwordEntry.password)
+                }
+                className="ml-3 bg-blue-500 text-white px-3 py-1 rounded"
+              >
+                Copy
+              </button>
+            </div>
+
+            {/* Actions: Edit and Delete */}
+            <div className="flex justify-center space-x-3">
+              <button
+                disabled
+                className="bg-gray-400 text-white px-3 py-1 rounded cursor-not-allowed"
+                title="Edit feature coming soon"
+              >
+                Edit
+              </button>
+              <button
+                onClick={async () => {
+                  await deletePassword(passwordEntry.id); // Delete password
+                  fetchPasswords(); // Fetch passwords again after deletion
+                }}
+                className="bg-red-500 text-white px-3 py-1 rounded"
+              >
+                Delete
+              </button>
+            </div>
           </li>
         ))}
       </ul>
