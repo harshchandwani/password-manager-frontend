@@ -27,9 +27,7 @@ const LoginPage: React.FC = () => {
         router.push("/dashboard"); // Redirect to the dashboard
       } else {
         const errorData = await response.json();
-        setError(
-          errorData.error || "Login failed! Please check your credentials."
-        );
+        setError(errorData.error);
       }
     } catch (error) {
       console.error("An error occurred:", error);

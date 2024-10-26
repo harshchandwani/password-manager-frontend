@@ -38,8 +38,10 @@ const AddPasswordPage: React.FC = () => {
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Failed to add password.");
+        router.push("/login");
       }
     } catch (error) {
+      router.push("/login");
       console.error("An error occurred:", error);
       setError("Failed to add password due to an error.");
     }

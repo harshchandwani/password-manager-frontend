@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
-import { json } from "stream/consumers";
+import { useRouter } from "next/navigation";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
@@ -23,8 +25,7 @@ const RegisterPage = () => {
         }
       );
       if (response.ok) {
-        // Handle success (e.g., redirect to login)
-        setError("Registerion Successfully");
+        router.push("/verify-email"); // Redirect to the verification process
       } else {
         // Handle error
         setError("Registration failed!");

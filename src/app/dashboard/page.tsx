@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
+import Image from "next/image";
 const DashboardPage: React.FC = () => {
   const [passwords, setPasswords] = useState([]);
   const [error, setError] = useState("");
@@ -74,10 +74,12 @@ const DashboardPage: React.FC = () => {
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Failed to delete password.");
+        router.push("/login");
       }
     } catch (error) {
       console.error("An error occurred:", error);
       setError("Failed to delete password due to an error.");
+      router.push("/login");
     }
   };
 
@@ -140,16 +142,15 @@ const DashboardPage: React.FC = () => {
             </div>
 
             {/* Password with Copy Button */}
-            <div className="flex items-center">
+            <div
+              className="flex items-center bg-white"
+              onClick={async () => {
+                navigator.clipboard.writeText(passwordEntry.password);
+              }}
+            >
               <span>{passwordEntry.password}</span>
-              <button
-                onClick={() =>
-                  navigator.clipboard.writeText(passwordEntry.password)
-                }
-                className="ml-3 bg-blue-500 text-white px-3 py-1 rounded"
-              >
-                Copy
-              </button>
+
+              <Image src="/copy.png" alt="copy-icon" height={1} width={30} />
             </div>
 
             {/* Actions: Edit and Delete */}
@@ -161,15 +162,21 @@ const DashboardPage: React.FC = () => {
               >
                 Edit
               </button>
-              <button
+
+              <div
                 onClick={async () => {
                   await deletePassword(passwordEntry.id); // Delete password
                   fetchPasswords(); // Fetch passwords again after deletion
                 }}
-                className="bg-red-500 text-white px-3 py-1 rounded"
+                className="cursor-pointer"
               >
-                Delete
-              </button>
+                <Image
+                  src="/delete-icon.png"
+                  alt="delete-icon"
+                  height={1}
+                  width={30}
+                />
+              </div>
             </div>
           </li>
         ))}
