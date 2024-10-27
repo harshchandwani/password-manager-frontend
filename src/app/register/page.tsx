@@ -1,6 +1,16 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
@@ -36,104 +46,71 @@ const RegisterPage = () => {
   };
 
   return (
-    <section className="h-screen">
-      <div className="h-full flex items-center justify-center">
-        {/* Container to limit width and add space on the sides */}
-        <div className="max-w-md w-full px-4 lg:px-6">
-          <div className="flex flex-wrap items-center justify-center lg:justify-between">
-            {/* Image Section */}
-            <div className="mb-12 w-full lg:w-6/12 hidden lg:block">
-              <img src="" className="w-full" alt="Sample image" />
+    <section className="h-screen flex items-center justify-center">
+      <Card className="mx-auto max-w-md w-full px-4 lg:px-6">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-2xl font-bold">Register</CardTitle>
+          <CardDescription>Create a new account</CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+              />
             </div>
 
-            {/* Register Form Section */}
-            <div className="w-full lg:w-5/12">
-              <form onSubmit={handleSubmit}>
-                {/* Email input */}
-                <div className="relative mb-6">
-                  <input
-                    type="email"
-                    className="peer block w-full lg:w-[450px] rounded border-0 bg-gray-600 px-5 py-2 outline-none transition-all duration-200 focus:placeholder-opacity-100 focus:text-primary dark:text-white dark:focus:text-primary"
-                    id="email"
-                    placeholder=""
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                  />
-                  <label
-                    htmlFor="email"
-                    className="pointer-events-none absolute left-5 top-2 text-neutral-500 transition-all duration-200 peer-focus:left-1 peer-focus:top-[-0.5rem] peer-focus:text-sm peer-focus:text-primary dark:text-neutral-400 dark:peer-focus:text-primary"
-                  >
-                    Email address
-                  </label>
-                </div>
-
-                {/* Password input */}
-                <div className="relative mb-6">
-                  <input
-                    type="password"
-                    className="peer block w-full lg:w-[450px] rounded border-0 bg-gray-600 px-5 py-2 outline-none transition-all duration-200 focus:placeholder-opacity-100 focus:text-primary dark:text-white dark:focus:text-primary"
-                    id="password"
-                    placeholder=""
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required
-                  />
-                  <label
-                    htmlFor="password"
-                    className="pointer-events-none absolute left-5 top-2 text-neutral-500 transition-all duration-200 peer-focus:left-1 peer-focus:top-[-0.5rem] peer-focus:text-sm peer-focus:text-primary dark:text-neutral-400 dark:peer-focus:text-primary"
-                  >
-                    Password
-                  </label>
-                </div>
-
-                {/* Confirm Password input */}
-                <div className="relative mb-6">
-                  <input
-                    type="password"
-                    className="peer block w-full lg:w-[450px] rounded border-0 bg-gray-600 px-5 py-2 outline-none transition-all duration-200 focus:placeholder-opacity-100 focus:text-primary dark:text-white dark:focus:text-primary"
-                    id="confirmPassword"
-                    placeholder=""
-                    value={confirmPassword}
-                    onChange={e => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                  <label
-                    htmlFor="confirmPassword"
-                    className="pointer-events-none absolute left-5 top-2 text-neutral-500 transition-all duration-200 peer-focus:left-1 peer-focus:top-[-0.5rem] peer-focus:text-sm peer-focus:text-primary dark:text-neutral-400 dark:peer-focus:text-primary"
-                  >
-                    Confirm Password
-                  </label>
-                </div>
-
-                {/* Error Message */}
-                {error && <p style={{ color: "red" }}>{error}</p>}
-
-                {/* Register button */}
-                <div className="text-center">
-                  <button
-                    type="submit"
-                    className="w-full lg:w-[450px] rounded bg-orange-500 px-7 py-3 text-sm font-medium uppercase text-white shadow transition duration-150 ease-in-out hover:bg-orange-600 focus:bg-orange-600 active:bg-orange-700"
-                  >
-                    Register
-                  </button>
-
-                  {/* Login link */}
-                  <p className="mt-2 text-sm font-semibold">
-                    Already have an account?{" "}
-                    <a
-                      href="/login"
-                      className="text-orange-400 transition duration-150 ease-in-out hover:text-orange-500 focus:text-orange-500 active:text-orange-600"
-                    >
-                      Login
-                    </a>
-                  </p>
-                </div>
-              </form>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Your Password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+              />
             </div>
-          </div>
-        </div>
-      </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm Your Password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* Display error message if any */}
+            {error && <p className="text-red-500 text-center">{error}</p>}
+
+            <Button type="submit" className="w-full">
+              Register
+            </Button>
+          </form>
+
+          {/* Login link */}
+          <p className="mt-4 text-center text-sm font-semibold">
+            Already have an account?{" "}
+            <a
+              href="/login"
+              className="text-orange-500 hover:text-orange-600 transition duration-150 ease-in-out"
+            >
+              Login
+            </a>
+          </p>
+        </CardContent>
+      </Card>
     </section>
   );
 };
