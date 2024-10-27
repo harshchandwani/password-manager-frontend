@@ -1,6 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -36,85 +40,61 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <section className="h-screen">
-      <div className="h-full flex items-center justify-center">
-        {/* Container to limit width and add space on the sides */}
-        <div className="max-w-md w-full px-4 lg:px-6">
-          <div className="flex flex-wrap items-center justify-center lg:justify-between">
-            {/* Image Section */}
-            <div className="mb-12 w-full lg:w-6/12 hidden lg:block">
-              <img src="" className="w-full" alt="Sample image" />
+    <section className="h-screen flex items-center justify-center">
+      <Card className="mx-auto max-w-md w-full px-4 lg:px-6">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-2xl font-bold">Login</CardTitle>
+          <CardDescription>
+            Enter your email and password to login to your account
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
 
-            {/* Login Form Section */}
-            <div className="w-full lg:w-5/12">
-              <form onSubmit={handleSubmit}>
-                {/* Email input */}
-                <div className="relative mb-6">
-                  <input
-                    type="email"
-                    className="peer block w-full lg:w-[450px] rounded border-0 bg-gray-600 px-5 py-2 outline-none transition-all duration-200 focus:placeholder-opacity-100 focus:text-primary dark:text-white dark:focus:text-primary"
-                    id="email"
-                    placeholder=""
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                  />
-                  <label
-                    htmlFor="email"
-                    className="pointer-events-none absolute left-5 top-2 text-neutral-500 transition-all duration-200 peer-focus:left-1 peer-focus:top-[-0.5rem] peer-focus:text-sm peer-focus:text-primary dark:text-neutral-400 dark:peer-focus:text-primary"
-                  >
-                    Email address
-                  </label>
-                </div>
-
-                {/* Password input */}
-                <div className="relative mb-6">
-                  <input
-                    type="password"
-                    className="peer block w-full lg:w-[450px] rounded border-0 bg-gray-600 px-5 py-2 outline-none transition-all duration-200 focus:placeholder-opacity-100 focus:text-primary dark:text-white dark:focus:text-primary"
-                    id="password"
-                    placeholder=""
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required
-                  />
-                  <label
-                    htmlFor="password"
-                    className="pointer-events-none absolute left-5 top-2 text-neutral-500 transition-all duration-200 peer-focus:left-1 peer-focus:top-[-0.5rem] peer-focus:text-sm peer-focus:text-primary dark:text-neutral-400 dark:peer-focus:text-primary"
-                  >
-                    Password
-                  </label>
-                </div>
-
-                {/* Error Message */}
-                {error && <p style={{ color: "red" }}>{error}</p>}
-
-                {/* Login button */}
-                <div className="text-center">
-                  <button
-                    type="submit"
-                    className="w-full lg:w-[450px] rounded bg-orange-500 px-7 py-3 text-sm font-medium uppercase text-white shadow transition duration-150 ease-in-out hover:bg-orange-600 focus:bg-orange-600 active:bg-orange-700"
-                  >
-                    Login
-                  </button>
-
-                  {/* Register link */}
-                  <p className="mt-2 text-sm font-semibold">
-                    Don't have an Account?{" "}
-                    <a
-                      href="/register"
-                      className="rounded bg-orange-500 px-7 py-3 text-sm font-medium uppercase text-white shadow transition duration-150 ease-in-out hover:bg-orange-600 focus:bg-orange-600 active:bg-orange-700"
-                    >
-                      Register
-                    </a>
-                  </p>
-                </div>
-              </form>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Your Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </div>
-          </div>
-        </div>
-      </div>
+
+            {/* Display error message if any */}
+            {error && <p className="text-red-500">{error}</p>}
+
+            <Button type="submit" className="w-full">
+              Login
+            </Button>
+          </form>
+
+          {/* Register link */}
+          <p className="mt-4 text-center text-sm font-semibold">
+            Don't have an account?{" "}
+            <a
+              href="/register"
+              className="text-orange-500 hover:text-orange-600"
+            >
+              Register
+            </a>
+          </p>
+        </CardContent>
+      </Card>
     </section>
   );
 };
