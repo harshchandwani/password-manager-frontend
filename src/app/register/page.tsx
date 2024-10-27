@@ -63,7 +63,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <section className="h-screen flex items-center justify-center">
+    <section className="h-screen flex items-center justify-center bg-black">
       <Card className="mx-auto max-w-md w-full px-4 lg:px-6">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-bold">Register</CardTitle>

@@ -2,6 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const VerifyEmailSuccess = () => {
   const router = useRouter();
@@ -43,18 +51,28 @@ const VerifyEmailSuccess = () => {
   }, [router, searchParams]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-3xl font-bold">
-        {redirecting ? "Verification Success" : "Email Verification"}
-      </h1>
-      <p className="mt-4">{statusMessage}</p>
-      {redirecting && <p className="mt-4">Redirecting in 5 seconds...</p>}
-      <button
-        onClick={() => router.push("/login")}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-      >
-        Go to Login
-      </button>
+    <div className="flex items-center justify-center min-h-screen bg-black p-4">
+      <Card className="max-w-sm w-full text-center space-y-4">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">
+            {redirecting ? "Verification Success" : "Email Verification"}
+          </CardTitle>
+          <CardDescription className="text-gray-600 mt-2">
+            {statusMessage}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {redirecting && (
+            <p className="text-gray-500">Redirecting in 5 seconds...</p>
+          )}
+          <Button
+            onClick={() => router.push("/login")}
+            className="w-full bg-blue-500 text-white hover:bg-blue-600 focus:bg-blue-600"
+          >
+            Login to Continue
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };
