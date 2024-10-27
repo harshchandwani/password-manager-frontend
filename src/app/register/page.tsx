@@ -11,6 +11,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
@@ -18,6 +19,7 @@ const RegisterPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +28,9 @@ const RegisterPage = () => {
       return;
     }
     try {
+      toast({
+        description: "Your message has been sent.",
+      });
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/register`,
         {
@@ -37,8 +42,20 @@ const RegisterPage = () => {
       if (response.ok) {
         router.push("/verify-email"); // Redirect to the verification process
       } else {
-        // Handle error
-        setError("Registration failed!");
+        response
+          .json()
+          .then(data => {
+            toast({
+              variant: "destructive",
+              description: data.error || "Registration failed!", // Fallback in case 'message' is missing
+            });
+          })
+          .catch(() => {
+            toast({
+              variant: "destructive",
+              description: "An unexpected error occurred. Please try again.",
+            });
+          });
       }
     } catch (error) {
       setError("Something went wrong");
@@ -90,10 +107,6 @@ const RegisterPage = () => {
                 required
               />
             </div>
-
-            {/* Display error message if any */}
-            {error && <p className="text-red-500 text-center">{error}</p>}
-
             <Button type="submit" className="w-full">
               Register
             </Button>

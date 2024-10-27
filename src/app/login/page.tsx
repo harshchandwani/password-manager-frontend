@@ -3,15 +3,22 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-
+  const { toast } = useToast();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -30,11 +37,22 @@ const LoginPage: React.FC = () => {
         localStorage.setItem("token", data.token); // Store the received JWT token
         router.push("/dashboard"); // Redirect to the dashboard
       } else {
-        const errorData = await response.json();
-        setError(errorData.error);
+        response
+          .json()
+          .then(data => {
+            toast({
+              variant: "destructive",
+              description: data.error || "Login Failed!", // Fallback in case 'message' is missing
+            });
+          })
+          .catch(() => {
+            toast({
+              variant: "destructive",
+              description: "An unexpected error occurred. Please try again.",
+            });
+          });
       }
     } catch (error) {
-      console.error("An error occurred:", error);
       setError("Login failed due to an error!");
     }
   };
@@ -58,7 +76,7 @@ const LoginPage: React.FC = () => {
                 type="email"
                 placeholder="m@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -70,13 +88,10 @@ const LoginPage: React.FC = () => {
                 type="password"
                 placeholder="Your Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 required
               />
             </div>
-
-            {/* Display error message if any */}
-            {error && <p className="text-red-500">{error}</p>}
 
             <Button type="submit" className="w-full">
               Login
