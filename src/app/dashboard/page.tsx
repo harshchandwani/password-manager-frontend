@@ -232,9 +232,9 @@ const DashboardPage: React.FC = () => {
       header: "Edit",
       cell: ({ row }) => (
         <button
-          className="px-3 py-1 rounded cursor-not-allowed"
-          title="Edit feature coming soon"
-          disabled
+          onClick={() => router.push(`/add-password/${row.original.id}`)}
+          className="px-3 py-1 rounded"
+          title="Edit"
         >
           <Edit width={15} height={15} />
         </button>

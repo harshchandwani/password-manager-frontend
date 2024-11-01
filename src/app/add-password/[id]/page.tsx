@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CircleX } from "lucide-react";
 
-const AddPasswordPage: React.FC = () => {
+const AddEditPasswordPage = ({ params }: { params: { id?: string } }) => {
   const [website, setWebsite] = useState("");
   const [websiteName, setWebsiteName] = useState("");
   const [username, setUsername] = useState("");
@@ -11,8 +11,46 @@ const AddPasswordPage: React.FC = () => {
   const [error, setError] = useState("");
   const router = useRouter();
 
+  const id = params.id;
+  console.log(id);
   const websiteRegex =
     /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/i;
+
+  useEffect(() => {
+    if (id) {
+      // Fetch existing password details for editing
+      const fetchPassword = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          router.push("/login");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/passwords/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (response.ok) {
+            const data = await response.json();
+            setWebsite(data.website);
+            setWebsiteName(data.websiteName);
+            setUsername(data.username);
+            setPassword(data.password);
+          } else {
+            setError("Failed to load password details.");
+          }
+        } catch (error) {
+          setError("An error occurred while fetching password details.");
+        }
+      };
+      fetchPassword();
+    }
+  }, [id, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,17 +67,18 @@ const AddPasswordPage: React.FC = () => {
         return;
       }
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/passwords`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ website, websiteName, username, password }),
-        }
-      );
+      const apiUrl = id
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/passwords/${id}`
+        : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/passwords`;
+
+      const response = await fetch(apiUrl, {
+        method: id ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ website, websiteName, username, password }),
+      });
 
       if (response.ok) {
         router.push("/dashboard");
@@ -55,7 +94,9 @@ const AddPasswordPage: React.FC = () => {
   return (
     <div className="max-w-lg mx-auto mt-10 p-6 shadow-lg rounded-lg">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">New Password</h1>
+        <h1 className="text-2xl font-bold">
+          {id ? "Edit Password" : "New Password"}
+        </h1>
         <button
           onClick={() => router.push("/dashboard")}
           className="text-sm text-gray-600 hover:text-gray-800"
@@ -142,11 +183,11 @@ const AddPasswordPage: React.FC = () => {
           type="submit"
           className="w-full p-2 text-sm font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600"
         >
-          Add Password
+          {id ? "Save Changes" : "Add Password"}
         </button>
       </form>
     </div>
   );
 };
 
-export default AddPasswordPage;
+export default AddEditPasswordPage;
