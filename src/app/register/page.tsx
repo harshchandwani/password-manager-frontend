@@ -18,6 +18,7 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
   const { toast } = useToast();
 
@@ -94,6 +95,7 @@ const RegisterPage = () => {
                 onChange={e => setPassword(e.target.value)}
                 required
               />
+              {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
             </div>
 
             <div className="space-y-2">

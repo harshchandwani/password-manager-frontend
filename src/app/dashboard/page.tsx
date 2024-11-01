@@ -1,11 +1,50 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Copy, Delete, DeleteIcon, Edit, OctagonX } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+type PasswordEntry = {
+  id: string;
+  websiteName: string;
+  username: string;
+  password: string;
+};
+
 const DashboardPage: React.FC = () => {
   const [passwords, setPasswords] = useState([]);
   const [error, setError] = useState("");
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchPasswords();
@@ -36,6 +75,10 @@ const DashboardPage: React.FC = () => {
         setPasswords(data); // Set the retrieved passwords
       } else {
         const errorData = await response.json();
+        toast({
+          variant: "destructive",
+          description: "Failed to load passwords.",
+        });
         setError(errorData.error || "Failed to load passwords.");
       }
     } catch (error) {
@@ -45,6 +88,9 @@ const DashboardPage: React.FC = () => {
   };
   const handleLogout = () => {
     localStorage.removeItem("token"); // Remove the token from local storage
+    toast({
+      description: "Logout Successful",
+    });
     router.push("/login"); // Redirect to login page
   };
   const deletePassword = async (id: string) => {
@@ -68,119 +114,212 @@ const DashboardPage: React.FC = () => {
       );
 
       if (response.ok) {
-        // Optionally, add a toast notification for success here
-        // e.g., toast.success("Password deleted successfully!");
-        // Refresh the password list or remove the deleted password from state
+        toast({
+          variant: "destructive",
+          description: "Password Deleted Successfully",
+        });
+        fetchPasswords();
       } else {
         const errorData = await response.json();
+        toast({
+          variant: "destructive",
+          description: "Failed to delete password",
+        });
         setError(errorData.error || "Failed to delete password.");
         router.push("/login");
       }
     } catch (error) {
       console.error("An error occurred:", error);
+      toast({
+        variant: "destructive",
+        description: "Failed to delete password due to an error.",
+      });
       setError("Failed to delete password due to an error.");
       router.push("/login");
     }
   };
 
+  const columns: ColumnDef<PasswordEntry>[] = [
+    {
+      accessorKey: "websiteName",
+      header: "Website Name",
+    },
+    {
+      accessorKey: "username",
+      header: "Username",
+      cell: ({ row }) => (
+        <div className="flex items-center">
+          <span>{row.getValue("username")}</span>
+          <button
+            onClick={() =>
+              navigator.clipboard.writeText(row.getValue("username"))
+            }
+            className="ml-1"
+          >
+            <Copy width={15} height={15} />
+          </button>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "password",
+      header: "Password",
+      cell: ({ row }) => (
+        <div className="flex items-center">
+          <span>{row.getValue("password")}</span>
+          <button
+            onClick={() =>
+              navigator.clipboard.writeText(row.getValue("password"))
+            }
+            className="ml-1"
+          >
+            <Copy width={15} height={15} />
+          </button>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "edit",
+      header: "Edit",
+      cell: ({ row }) => (
+        <button
+          className="px-3 py-1 rounded cursor-not-allowed"
+          title="Edit feature coming soon"
+          disabled
+        >
+          <Edit width={15} height={15} />
+        </button>
+      ),
+    },
+    {
+      id: "delete",
+      header: "Delete",
+      cell: ({ row }) => (
+        <div className="flex space-x-2">
+          <button
+            onClick={() => deletePassword(row.original.id)}
+            className="px-3 py-1 rounded"
+          >
+            <OctagonX width={15} height={15} />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  const table = useReactTable({
+    data: passwords,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+  });
+
   return (
     <div className="container mx-auto p-6">
-      {/* Heading */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-4xl font-bold">Passwords</h1>
+        <h1 className="text-3xl font-bold">Passwords</h1>
         <div className="flex space-x-4">
-          {/* Add New Password Button */}
-          <button
-            onClick={() => router.push("/add-password")} // Redirect to add-password page
-            className="bg-orange-500 text-white px-4 py-2 rounded"
-          >
+          <Button onClick={() => router.push("/add-password")}>
             Add New Password
-          </button>
-
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded"
-          >
+          </Button>
+          <Button variant="destructive" onClick={handleLogout}>
             Logout
-          </button>
+          </Button>
         </div>
       </div>
 
-      {/* Error Message */}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {/* Table Header */}
-      <div className="grid grid-cols-5 gap-4 items-center font-semibold mb-3">
-        <div className="text-left">Website Name</div>
-        <div className="text-left">Username</div>
-        <div className="text-left">Password</div>
-        <div className="text-center">Actions</div>
+      {/* For Seach */}
+      <div className="flex items-center py-4">
+        <Input
+          placeholder="Filter websites..."
+          value={
+            (table.getColumn("websiteName")?.getFilterValue() as string) ?? ""
+          }
+          onChange={e =>
+            table.getColumn("websiteName")?.setFilterValue(e.target.value)
+          }
+          className="max-w-sm"
+        />
       </div>
 
-      {/* Password Entries */}
-      <ul>
-        {passwords.map(passwordEntry => (
-          <li
-            key={passwordEntry.id}
-            className="grid grid-cols-5 gap-4 items-center mb-3"
-          >
-            {/* Website Name */}
-            <div className="text-left">{passwordEntry.websiteName}</div>
+      <div className="rounded-md">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map(headerGroup => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map(row => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map(cell => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No passwords available.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
-            {/* Username */}
-            <div className="flex items-center">
-              <span>{passwordEntry.username}</span>
-              <button
-                onClick={() =>
-                  navigator.clipboard.writeText(passwordEntry.username)
-                }
-                className="ml-3 bg-blue-500 text-white px-3 py-1 rounded"
-              >
-                Copy
-              </button>
-            </div>
-
-            {/* Password with Copy Button */}
-            <div
-              className="flex items-center bg-white"
-              onClick={async () => {
-                navigator.clipboard.writeText(passwordEntry.password);
-              }}
-            >
-              <span>{passwordEntry.password}</span>
-
-              <Image src="/copy.png" alt="copy-icon" height={1} width={30} />
-            </div>
-
-            {/* Actions: Edit and Delete */}
-            <div className="flex justify-center space-x-3">
-              <button
-                disabled
-                className="bg-gray-400 text-white px-3 py-1 rounded cursor-not-allowed"
-                title="Edit feature coming soon"
-              >
-                Edit
-              </button>
-
-              <div
-                onClick={async () => {
-                  await deletePassword(passwordEntry.id); // Delete password
-                  fetchPasswords(); // Fetch passwords again after deletion
-                }}
-                className="cursor-pointer"
-              >
-                <Image
-                  src="/delete-icon.png"
-                  alt="delete-icon"
-                  height={1}
-                  width={30}
-                />
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div className="flex justify-end py-4 ">
+        <Button
+          className="mr-2"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 };
