@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { CircleX } from "lucide-react";
 
 const AddPasswordPage: React.FC = () => {
   const [website, setWebsite] = useState("");
@@ -11,17 +12,17 @@ const AddPasswordPage: React.FC = () => {
   const router = useRouter();
   const websiteRegex =
     /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/i;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
 
     if (!token) {
-      router.push("/login"); // Redirect to login if not authenticated
+      router.push("/login");
       return;
     }
 
     try {
-      // Validate email
       if (!websiteRegex.test(website)) {
         setError("Please enter a valid website URL.");
         return;
@@ -32,14 +33,13 @@ const AddPasswordPage: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Send the token with the request
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ website, websiteName, username, password }),
         }
       );
 
       if (response.ok) {
-        // Redirect to the dashboard or another page after successful addition
         router.push("/dashboard");
       } else {
         const errorData = await response.json();
@@ -55,7 +55,16 @@ const AddPasswordPage: React.FC = () => {
 
   return (
     <div className="max-w-lg mx-auto mt-10 p-6 shadow-lg rounded-lg">
-      <h1 className="text-2xl font-bold text-center mb-6">New Password</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">New Password</h1>
+        <button
+          onClick={() => router.push("/dashboard")}
+          className="text-sm text-gray-600 hover:text-gray-800"
+        >
+          <CircleX />
+        </button>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Website URL */}
         <div>
@@ -128,8 +137,10 @@ const AddPasswordPage: React.FC = () => {
             className="w-full p-1 border text-black text-sm border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
           />
         </div>
+
         {/* Error Message */}
         {error && <p className="text-red-500 mb-4">{error}</p>}
+
         {/* Submit Button */}
         <button
           type="submit"
