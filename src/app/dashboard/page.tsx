@@ -93,10 +93,10 @@ const DashboardPage: React.FC = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    router.push("/login");
     toast({
       description: "Logout Successful",
     });
-    router.push("/login");
   };
 
   const deletePassword = async (id: string) => {
@@ -196,6 +196,10 @@ const DashboardPage: React.FC = () => {
     {
       accessorKey: "websiteName",
       header: "Website Name",
+    },
+    {
+      accessorKey: "website",
+      header: "Website URL",
     },
     {
       accessorKey: "username",

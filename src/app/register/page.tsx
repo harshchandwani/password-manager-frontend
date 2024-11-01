@@ -19,6 +19,7 @@ const RegisterPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
   const passwordRegex =
@@ -26,17 +27,19 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setLoading(true);
     // Validate password
     if (!passwordRegex.test(password)) {
       setErrorMessage(
         "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character."
       );
+      setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match!");
+      setLoading(false);
       return;
     }
     try {
@@ -71,6 +74,8 @@ const RegisterPage = () => {
       }
     } catch (error) {
       setError("Something went wrong");
+    } finally {
+      setLoading(false); // Reset loading state after completion
     }
   };
 
@@ -122,8 +127,11 @@ const RegisterPage = () => {
             {errorMessage && (
               <p className="text-red-500 text-sm">{errorMessage}</p>
             )}
-            <Button type="submit" className="w-full">
-              Register
+            <Button
+              type="submit"
+              className={`w-full ${loading ? "loading" : ""}`} // Add loading class
+            >
+              {loading ? "Registering ..." : "Register"}
             </Button>
           </form>
 

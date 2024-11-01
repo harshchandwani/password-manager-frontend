@@ -18,6 +18,7 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
   const passwordRegex =
@@ -25,13 +26,14 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       // Validate password
       if (!passwordRegex.test(password)) {
         setErrorMessage(
           "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character."
         );
+        setLoading(false);
         return;
       }
 
@@ -62,10 +64,13 @@ const LoginPage: React.FC = () => {
               variant: "destructive",
               description: "An unexpected error occurred. Please try again.",
             });
+            setLoading(false);
           });
       }
     } catch (error) {
       setError("Login failed due to an error!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -107,8 +112,11 @@ const LoginPage: React.FC = () => {
             {errorMessage && (
               <p className="text-red-500 text-sm">{errorMessage}</p>
             )}
-            <Button type="submit" className="w-full">
-              Login
+            <Button
+              type="submit"
+              className={`w-full ${loading ? "loading" : ""}`} // Add loading class
+            >
+              {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
 
