@@ -23,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Copy, Delete, DeleteIcon, Edit, OctagonX } from "lucide-react";
+import { Copy, OctagonX, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type PasswordEntry = {
@@ -43,6 +43,10 @@ const DashboardPage: React.FC = () => {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPasswordId, setSelectedPasswordId] = useState<string | null>(
+    null
+  );
   const router = useRouter();
   const { toast } = useToast();
 
@@ -54,7 +58,7 @@ const DashboardPage: React.FC = () => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      router.push("/login"); // Redirect to login if not authenticated
+      router.push("/login");
       return;
     }
 
@@ -65,14 +69,14 @@ const DashboardPage: React.FC = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Send the token with the request
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       if (response.ok) {
         const data = await response.json();
-        setPasswords(data); // Set the retrieved passwords
+        setPasswords(data);
       } else {
         const errorData = await response.json();
         toast({
@@ -86,18 +90,20 @@ const DashboardPage: React.FC = () => {
       setError("Failed to load passwords due to an error.");
     }
   };
+
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Remove the token from local storage
+    localStorage.removeItem("token");
     toast({
       description: "Logout Successful",
     });
-    router.push("/login"); // Redirect to login page
+    router.push("/login");
   };
+
   const deletePassword = async (id: string) => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      router.push("/login"); // Redirect to login if not authenticated
+      router.push("/login");
       return;
     }
 
@@ -108,7 +114,7 @@ const DashboardPage: React.FC = () => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Send the token with the request
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -138,6 +144,53 @@ const DashboardPage: React.FC = () => {
       router.push("/login");
     }
   };
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        toast({
+          description: "Copied to clipboard!",
+        });
+      },
+      () => {
+        toast({
+          variant: "destructive",
+          description: "Failed to copy to clipboard.",
+        });
+      }
+    );
+  };
+  const ConfirmationModal = ({
+    isOpen,
+    onClose,
+    onConfirm,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+  }) => {
+    if (!isOpen) return null;
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white text-black bg-opacity-50">
+        <div className="bg-white p-6 rounded shadow-md w-80">
+          <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
+          <p>Are you sure you want to delete this password?</p>
+          <div className="mt-4 flex justify-end space-x-4">
+            <Button variant="destructive" onClick={onConfirm}>
+              Delete
+            </Button>
+            <Button onClick={onClose}>Cancel</Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  const handleConfirmDelete = () => {
+    if (selectedPasswordId) {
+      deletePassword(selectedPasswordId);
+      setSelectedPasswordId(null);
+    }
+    setIsModalOpen(false);
+  };
 
   const columns: ColumnDef<PasswordEntry>[] = [
     {
@@ -148,16 +201,13 @@ const DashboardPage: React.FC = () => {
       accessorKey: "username",
       header: "Username",
       cell: ({ row }) => (
-        <div className="flex items-center">
+        <div
+          className="flex items-center relative cursor-pointer group"
+          onClick={() => handleCopy(row.getValue("username"))}
+          title="Click to copy"
+        >
           <span>{row.getValue("username")}</span>
-          <button
-            onClick={() =>
-              navigator.clipboard.writeText(row.getValue("username"))
-            }
-            className="ml-1"
-          >
-            <Copy width={15} height={15} />
-          </button>
+          <Copy width={15} height={15} className="ml-1" />
         </div>
       ),
     },
@@ -165,16 +215,15 @@ const DashboardPage: React.FC = () => {
       accessorKey: "password",
       header: "Password",
       cell: ({ row }) => (
-        <div className="flex items-center">
-          <span>{row.getValue("password")}</span>
-          <button
-            onClick={() =>
-              navigator.clipboard.writeText(row.getValue("password"))
-            }
-            className="ml-1"
-          >
-            <Copy width={15} height={15} />
-          </button>
+        <div
+          className="flex items-center relative cursor-pointer group"
+          onClick={() => handleCopy(row.getValue("password"))}
+          title="Click to copy"
+        >
+          <span className="blur-sm group-hover:blur-none transition duration-200">
+            {row.getValue("password")}
+          </span>
+          <Copy width={15} height={15} className="ml-1" />
         </div>
       ),
     },
@@ -197,7 +246,10 @@ const DashboardPage: React.FC = () => {
       cell: ({ row }) => (
         <div className="flex space-x-2">
           <button
-            onClick={() => deletePassword(row.original.id)}
+            onClick={() => {
+              setSelectedPasswordId(row.original.id);
+              setIsModalOpen(true);
+            }}
             className="px-3 py-1 rounded"
           >
             <OctagonX width={15} height={15} />
@@ -240,7 +292,6 @@ const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* For Seach */}
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter websites..."
@@ -303,7 +354,7 @@ const DashboardPage: React.FC = () => {
         </Table>
       </div>
 
-      <div className="flex justify-end py-4 ">
+      <div className="flex justify-end py-4">
         <Button
           className="mr-2"
           size="sm"
@@ -320,6 +371,11 @@ const DashboardPage: React.FC = () => {
           Next
         </Button>
       </div>
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };
