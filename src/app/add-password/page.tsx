@@ -9,7 +9,8 @@ const AddPasswordPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const websiteRegex =
+    /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/i;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -21,8 +22,8 @@ const AddPasswordPage: React.FC = () => {
 
     try {
       // Validate email
-      if (!emailRegex.test(username)) {
-        setError("Invalid email address.");
+      if (!websiteRegex.test(website)) {
+        setError("Please enter a valid website URL.");
         return;
       }
       const response = await fetch(
@@ -54,11 +55,7 @@ const AddPasswordPage: React.FC = () => {
 
   return (
     <div className="max-w-lg mx-auto mt-10 p-6 shadow-lg rounded-lg">
-      <h1 className="text-3xl font-bold text-center mb-6">New Password</h1>
-
-      {/* Error Message */}
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-
+      <h1 className="text-2xl font-bold text-center mb-6">New Password</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Website URL */}
         <div>
@@ -74,7 +71,7 @@ const AddPasswordPage: React.FC = () => {
             value={website}
             onChange={e => setWebsite(e.target.value)}
             required
-            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
+            className="w-full p-1 border text-black text-sm border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -92,7 +89,7 @@ const AddPasswordPage: React.FC = () => {
             value={websiteName}
             onChange={e => setWebsiteName(e.target.value)}
             required
-            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
+            className="w-full p-1 border text-black text-sm border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -110,7 +107,7 @@ const AddPasswordPage: React.FC = () => {
             value={username}
             onChange={e => setUsername(e.target.value)}
             required
-            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
+            className="w-full p-1 border text-black text-sm border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -128,7 +125,7 @@ const AddPasswordPage: React.FC = () => {
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
-            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
+            className="w-full p-1 border text-black text-sm border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
           />
         </div>
         {/* Error Message */}
@@ -136,7 +133,7 @@ const AddPasswordPage: React.FC = () => {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full p-3 text-sm font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-opacity-50"
+          className="w-full p-2 text-sm font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-opacity-50"
         >
           Add Password
         </button>
