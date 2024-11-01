@@ -17,12 +17,24 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
   const { toast } = useToast();
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      // Validate password
+      if (!passwordRegex.test(password)) {
+        setErrorMessage(
+          "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character."
+        );
+        return;
+      }
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/login`,
         {
@@ -92,7 +104,9 @@ const LoginPage: React.FC = () => {
                 required
               />
             </div>
-
+            {errorMessage && (
+              <p className="text-red-500 text-sm">{errorMessage}</p>
+            )}
             <Button type="submit" className="w-full">
               Login
             </Button>

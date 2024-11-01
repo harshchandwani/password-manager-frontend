@@ -21,9 +21,20 @@ const RegisterPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
   const { toast } = useToast();
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate password
+    if (!passwordRegex.test(password)) {
+      setErrorMessage(
+        "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character."
+      );
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match!");
       return;
@@ -95,7 +106,6 @@ const RegisterPage = () => {
                 onChange={e => setPassword(e.target.value)}
                 required
               />
-              {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
             </div>
 
             <div className="space-y-2">
@@ -109,6 +119,9 @@ const RegisterPage = () => {
                 required
               />
             </div>
+            {errorMessage && (
+              <p className="text-red-500 text-sm">{errorMessage}</p>
+            )}
             <Button type="submit" className="w-full">
               Register
             </Button>
