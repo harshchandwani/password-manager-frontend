@@ -11,18 +11,23 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 const VerifyEmailPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleResendEmail = async () => {
     setLoading(true);
     try {
-      const response = await axios.post("/api/resend-verification-email", {
-        email,
-      });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/resend-verification-email`,
+        {
+          email,
+        }
+      );
 
       if (response.status === 200) {
         toast({

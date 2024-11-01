@@ -9,7 +9,7 @@ const AddPasswordPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -20,6 +20,11 @@ const AddPasswordPage: React.FC = () => {
     }
 
     try {
+      // Validate email
+      if (!emailRegex.test(username)) {
+        setError("Invalid email address.");
+        return;
+      }
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/passwords`,
         {
@@ -126,7 +131,8 @@ const AddPasswordPage: React.FC = () => {
             className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
           />
         </div>
-
+        {/* Error Message */}
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         {/* Submit Button */}
         <button
           type="submit"
