@@ -34,6 +34,14 @@ Backend: https://github.com/harshchandwani/password-manager-backend
 
 ![image](https://github.com/user-attachments/assets/6bd7dd4e-a82b-489f-9ff3-542decb32316)
 
+**New Password Addition**
+
+![image](https://github.com/user-attachments/assets/2ee92601-dd75-4a0c-87e1-ef8a0c64dec5)
+
+**Dashboard**
+
+![image](https://github.com/user-attachments/assets/3a95c05c-6f63-4552-9838-3561f07a0e99)
+
 
 ## To Use
 
