@@ -31,7 +31,8 @@ Backend: https://github.com/harshchandwani/password-manager-backend
 ## Processes
 
 **Register**
-![image](https://github.com/user-attachments/assets/4033caaf-9b1c-450d-99fe-b9c0e7e56ab1)
+
+![image](https://github.com/user-attachments/assets/6bd7dd4e-a82b-489f-9ff3-542decb32316)
 
 
 ## To Use
